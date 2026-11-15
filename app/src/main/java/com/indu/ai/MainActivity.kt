@@ -1,7 +1,6 @@
 
 package com.indu.ai
 
-import android.app.Activity
 import android.os.Bundle
 import android.graphics.Color
 import android.view.Gravity
@@ -9,11 +8,16 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : Activity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var biometricAuth: BiometricAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        biometricAuth = BiometricAuth(this)
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -37,7 +41,7 @@ class MainActivity : Activity() {
         }
 
         val status = TextView(this).apply {
-            text = "আমি প্রস্তুত। তোমার নির্দেশের অপেক্ষায় আছি।"
+            text = "নিরাপত্তা যাচাই করে শুরু করো"
             textSize = 16f
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
@@ -45,13 +49,26 @@ class MainActivity : Activity() {
         }
 
         val button = Button(this).apply {
-            text = "INDU AI শুরু করো"
+            text = "Fingerprint দিয়ে শুরু করো"
+
             setOnClickListener {
-                Toast.makeText(
-                    this@MainActivity,
-                    "INDU AI প্রস্তুত হচ্ছে!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                biometricAuth.authenticate(
+                    onSuccess = {
+                        status.text = "INDU AI আনলক হয়েছে!"
+                        Toast.makeText(
+                            this@MainActivity,
+                            "স্বাগতম! INDU AI প্রস্তুত।",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onError = { error ->
+                        Toast.makeText(
+                            this@MainActivity,
+                            error,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
             }
         }
 
